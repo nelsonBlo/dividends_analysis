@@ -1,18 +1,18 @@
 Dividends Information & Analysis for a given Period
 ===
 
-What companies are about to pay dividends? Sometimes we need to clear up this doubt. But in addition, we also need to 
-know vital information about the company: its current position and historical behavior in the stock market. And it is also 
-necessary to know their history of dividend payments: since when have they been paid, is the percentage increasing or 
-decreasing, or is it constant, what is the frequency?
+What companies are about to pay dividends? 
+Sometimes we need to clear up this doubt. But in addition, we need to get vital information about the company: its current 
+position and historical behavior in the stock market. And it is also necessary to know their history of dividend 
+payments: since when have they been paid? is the percentage increasing or decreasing?, perhaps is it constant?, 
+what is the frequency?
 
-This app helps answer these questions quickly and supported by graphics. It reviews the list of companies that will 
-pay dividends `next week` and displays the list in a grid. Information that will be seen here: Company Name, Dividend, 
-Payment Date, etc.
+This app helps answer these questions quickly. It shows the list of companies that will pay dividends `next week` and 
+displays this list in a grid. Information that will be seen here: Company Name, Dividend, Payment Date, etc.
 
 ![img_3.png](img_3.png)
 
-By selecting a company in this grid, related information will be displayed in the graphs and tables located below.
+By selecting a company, related information will be displayed in the graphs and tables located below.
 - Stock Price for the last 5 years:
    ![img_2.png](img_2.png)
 - Historical Dividends information:
@@ -35,14 +35,14 @@ and DIVIDENDS is to obtain information for dividends. Since most dividends are p
 
 The default market is USA, but you can also configure this. Some example values:
 
-Country  | Value 
--------- | -------- 
-USA    | 5 
-ARGENTINA    | 29 
-BRAZIL    | 32 
-CHINA    | 37 
+| Country   | Value |
+|-----------|-------|
+| USA       | 5     |
+| ARGENTINA | 29    |
+| BRAZIL    | 32    |
+| CHINA     | 37    |
 
-Just replace any of these integer value in the `general.conf`, section `INVESTING`, country parameter:
+Just replace any of these integer value in `general.conf` file, section `INVESTING`:
 ```
     [INVESTING]
     COUNTRY=5

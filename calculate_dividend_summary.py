@@ -12,7 +12,7 @@ INITIAL_PART_DIVIDENDS_SCORECARD = config.get('FILE_NAMES', 'INITIAL_PART_DIVIDE
 # INITIAL_PART_DIVIDENDS_SCORECARD = 'dividends_scorecard_'
 
 
-def get_dividend_scorecard(ticker="KO", time_delta=60):
+def get_dividend_summary(ticker="KO", time_delta=60):
     file_name = f'{INITIAL_PART_DIVIDENDS_SCORECARD}{ticker}'
     latest_file = get_latest_file(file_name=file_name, days_delta=time_delta)
 

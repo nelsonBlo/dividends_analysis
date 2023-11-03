@@ -7,7 +7,7 @@ import pandas as pd
 import get_historical_data_by_ticker
 import get_dividends
 import get_dividends_historical_by_ticker
-import calculate_dividend_scorecard
+import calculate_dividend_summary
 import configparser
 
 config = configparser.ConfigParser()
@@ -43,7 +43,7 @@ style_cell = {
     "font-family": font_figure,
     "padding": "10px",
     "border": "thin solid #FFFFFF",
-    'width': 100
+    'width': 120
 }
 style_data_conditional = [
     {"if": {"row_index": "odd"}, "backgroundColor": "#E8E8E8"}
@@ -89,10 +89,9 @@ app.layout = html.Div(
         dcc.Graph(id='stocks', figure=fig_historical_data),
         dcc.Graph(id='dividends_hist', figure=fig_historical_dividends),
         html.Div([html.H2("")], id="title-dividend_Payout",
-                 style={'textAlign': 'center', 'font-family': font_figure, 'color': dark_gray}
-                 ),
-        html.H3(style={'color': 'black', 'width': '25%', 'marginLeft': 'auto', 'marginRight': 'auto',
-                       'font': font_figure}, id='dividends_scorecard'),
+                 style={'textAlign': 'center', 'font-family': font_figure, 'color': dark_gray}),
+        html.H3(style={'color': 'black',  "width": "33%", 'textAlign': 'center', 'marginLeft': 'auto', 'marginRight': 'auto',
+                       'font': font_figure}, id='dividends_summary'),
         html.Div(style={"width": "15%", "textAlign": "center", 'marginLeft': 'auto', 'marginRight': 'auto',
                         'font': font_figure}, id="dividends_full")
     ]
@@ -111,22 +110,24 @@ def display_dividend_payout_title(row):
 
 
 @callback(
-    Output("dividends_scorecard", "children"),
+    Output("dividends_summary", "children"),
     Input("dividends_general_grid", "selectedRows")
 )
-def display_dividend_scorecard(row):
+def display_dividend_summary(row):
+    time.sleep(3)
     if row is not None:
         cell = row[0]['Company (Ticker)']
         ticker = cell[cell.find("(") + 1:cell.find(")")]
-        dg = calculate_dividend_scorecard.get_dividend_scorecard(ticker=ticker, time_delta=time_delta_dividends)
+        dg = calculate_dividend_summary.get_dividend_summary(ticker=ticker, time_delta=time_delta_dividends)
         columns = [{"name": i, "id": i, } for i in dg.columns]
         dg_data = dg.to_dict('records')
         return dash_table.DataTable(data=dg_data, columns=columns, fill_width=False, style_table={'overflowX': 'auto'},
-                                    style_cell={'text-align': 'center', "font-family": font_figure},
-                                    style_data={'backgroundColor': main_color, 'color': '#E8E8E8'},
+                                    style_cell={'text-align': 'center', "font-family": font_figure,
+                                                'backgroundColor': '#ccccc'},
+                                    style_data={'backgroundColor': '#E8E8E8', 'color': dark_gray},
                                     style_header={
-                                        "backgroundColor": "#DEDEDE",
-                                        # "color": "#FFFFFF",
+                                        "backgroundColor": main_color,
+                                        "color": "#FFFFFF",
                                         "padding": "10px",
                                         "border": "0",
                                     }
@@ -139,7 +140,7 @@ def display_dividend_scorecard(row):
 )
 def display_dividend_table(row):
     if row is not None:
-        time.sleep(2)
+        time.sleep(3)
         cell = row[0]['Company (Ticker)']
         ticker = cell[cell.find("(") + 1:cell.find(")")]
         dg = get_dividends_historical_by_ticker.get_historical_dividends(ticker=ticker, time_delta=time_delta_dividends)
@@ -181,7 +182,7 @@ def display_stocks_figure(row):
                                                                end_date=END_DATE, days_delta=time_delta_stocks)
         fig_historical_data = go.Figure([go.Scatter(x=df[df.columns[0]], y=df['close'])])
         fig_historical_data.update_layout(title=dict(
-            text=f"<b>Historical Stock Price (5 Years) for [{ticker}]</b>",
+            text=f"<b>Stock Price (5 Years) for [{ticker}]</b>",
             font=dict(
                 family=font_figure,
                 size=font_size,
@@ -202,13 +203,13 @@ def display_stocks_figure(row):
 )
 def display_historical_dividends_figure(row):
     if row is None:
-        fig_historical_data = go.Figure([go.Scatter(x=[], y=[])])
+        fig_historical_dividends = go.Figure([go.Scatter(x=[], y=[])])
     else:
         cell = row[0]['Company (Ticker)']
         ticker = cell[cell.find("(") + 1:cell.find(")")]
         df = get_dividends_historical_by_ticker.get_historical_dividends(ticker=ticker, time_delta=time_delta_dividends)
-        fig_historical_data = go.Figure([go.Scatter(x=df['date'], y=df['dividend'])])
-        fig_historical_data.update_layout(title=dict(
+        fig_historical_dividends = go.Figure([go.Scatter(x=df['date'], y=df['dividend'])])
+        fig_historical_dividends.update_layout(title=dict(
             text=f"<b>Historical Dividends Information for [{ticker}]</b>",
             font=dict(
                 family=font_figure,
@@ -221,7 +222,7 @@ def display_historical_dividends_figure(row):
             yanchor='top'),
             yaxis_title='<b>Dividends US$</b>'
         )
-    return fig_historical_data
+    return fig_historical_dividends
 
 
 # Run the app

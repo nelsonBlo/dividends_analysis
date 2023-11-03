@@ -1,3 +1,4 @@
 /.idea/
 .gitignore
+/csv_files/*
 __pycache__/

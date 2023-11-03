@@ -51,7 +51,7 @@ Just replace any of these integer value in `general.conf` file, section `INVESTI
 
 How to use it
 ---
-1. Install requirements: ```pip3 install requirements.txt```
+1. Install requirements: ```pip3 install -r requirements.txt```
 2. Run app.py: ```python3 app.py``` or ```py app.py``` 
 3. Open a browser and go to: http://127.0.0.1:8050/
 4. Click on any of the tickers or companies of grid. Information related is shown below.

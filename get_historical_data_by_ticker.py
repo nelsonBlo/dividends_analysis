@@ -8,7 +8,6 @@ import configparser
 config = configparser.ConfigParser()
 config.read('./conf/general.conf')
 INITIAL_PART_HISTORICAL_DATA_TICKER = config.get('FILE_NAMES', 'INITIAL_PART_HISTORICAL_DATA_TICKER')
-# INITIAL_PART_HISTORICAL_DATA_TICKER = 'historical_data_'
 
 
 def get_historical_data(ticker='KO', start_date='', end_date='', days_delta=1):

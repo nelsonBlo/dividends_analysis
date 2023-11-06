@@ -1,14 +1,13 @@
-import time
 from datetime import date, timedelta
 from dash import Dash, html, Input, Output, callback, dcc, dash_table
 import dash_ag_grid as dag
-import plotly.graph_objects as go
 import pandas as pd
 import get_historical_data_by_ticker
 import get_dividends
 import get_dividends_historical_by_ticker
 import calculate_dividend_summary
 import configparser
+import plotly.express as px
 
 config = configparser.ConfigParser()
 config.read('./conf/general.conf')
@@ -64,14 +63,11 @@ columnDefs = [
     {"field": "Yield"}
 ]
 
-fig_historical_data = go.Figure([go.Scatter(x=[], y=[])])
-fig_historical_dividends = go.Figure([go.Scatter(x=[], y=[])])
-
 app.layout = html.Div(
     [
         html.Div([html.H2(f"Dividends Information for {filter_time}:")],
                  style={'font-family': font_figure, "color": main_color}),
-        dag.AgGrid(
+        html.Div([dag.AgGrid(
             id="dividends_general_grid",
             rowData=df.to_dict("records"),
             className="ag-theme-alpine",
@@ -84,41 +80,88 @@ app.layout = html.Div(
                 'columnLimits': [{'key': 'Date', 'minWidth': 250},
                                  {'key': 'Company (Ticker)', 'minWidth': 500}],
             },
-        ),
-        html.Div(id="dividends"),
-        dcc.Graph(id='stocks', figure=fig_historical_data),
-        dcc.Graph(id='dividends_hist', figure=fig_historical_dividends),
-        html.Div([html.H2("")], id="title-dividend_Payout",
-                 style={'textAlign': 'center', 'font-family': font_figure, 'color': dark_gray}),
-        html.H3(style={'color': 'black',  "width": "33%", 'textAlign': 'center', 'marginLeft': 'auto', 'marginRight': 'auto',
-                       'font': font_figure}, id='dividends_summary'),
+        )]),
+        html.Div([html.Div(id='stocks', children=[]), ]),
+        html.Div([html.Div(id='dividends_hist', children=[]), ]),
+        html.Div(id="title-dividend_Payout",
+                 style={'textAlign': 'center', 'font-family': font_figure, 'color': dark_gray},
+                 ),
+        html.Div(
+            style={'color': 'black', "display": "flex", "justify-content": "center", "align-items": "center",
+                   "height": "8vh",'font': font_figure}, id='dividends_summary', children=[]),
         html.Div(style={"width": "15%", "textAlign": "center", 'marginLeft': 'auto', 'marginRight': 'auto',
-                        'font': font_figure}, id="dividends_full")
+                        'font': font_figure}, id="dividends_full"),
+
+        dcc.Store(id='store-data', data=[], storage_type='memory')
     ]
 )
 
 
 @callback(
-    Output("title-dividend_Payout", "children"),
-    Input("dividends_general_grid", "selectedRows")
+    Output('store-data', 'data'),
+    Input('dividends_general_grid', 'selectedRows')
 )
-def display_dividend_payout_title(row):
+def store_data(row):
     if row is not None:
         cell = row[0]['Company (Ticker)']
         ticker = cell[cell.find("(") + 1:cell.find(")")]
-        return html.H2(f"Dividend Payout History for [{ticker}]")
+        dg = get_dividends_historical_by_ticker.get_historical_dividends(ticker=ticker, time_delta=time_delta_dividends)
+        dg["date"] = pd.to_datetime(dg["date"])
+        dg["YEAR"] = dg["date"].dt.year
+        dg["date"] = dg["date"].dt.date
+        dg.sort_values(by='date', ascending=False, inplace=True)
+        dg['YEAR'] = dg['YEAR'].where(dg['YEAR'] != dg['YEAR'].shift(), '')
+        return dg.to_dict('records')
+
+
+@callback(
+    Output("dividends_hist", "children"),
+    Input("store-data", "data")
+)
+def display_historical_dividends_figure(data):
+    if data is not None:
+        dff = pd.DataFrame(data)
+        fig_historical_dividends = px.line(dff, x='date', y='dividend', markers=True)
+        fig_historical_dividends.update_layout(title=dict(
+            text=f"<b>Historical Dividends Information for [{dff['ticker'][0]}]</b>",
+            font=dict(
+                family=font_figure,
+                size=font_size,
+                color=dark_gray
+            ),
+            y=0.9,
+            x=0.5,
+            xanchor='center',
+            yanchor='top'),
+            yaxis_title='<b>Dividends US$</b>',
+            xaxis_title=""
+        )
+        return dcc.Graph(figure=fig_historical_dividends)
+
+
+@callback(
+    Output("dividends_full", "children"),
+    Input("store-data", "data")
+)
+def display_dividend_table(data):
+    if data is not None:
+        dff = pd.DataFrame(data)
+        columns = [{"name": i, "id": i, } for i in dff[['YEAR', 'dividend', 'date']]]
+        return dash_table.DataTable(data=dff.to_dict('records'), columns=columns, fill_width=False,
+                                    style_header=style_header,
+                                    style_cell=style_cell,
+                                    style_data_conditional=style_data_conditional,
+                                    style_table=style_table,
+                                    )
 
 
 @callback(
     Output("dividends_summary", "children"),
-    Input("dividends_general_grid", "selectedRows")
+    Input("store-data", "data")
 )
-def display_dividend_summary(row):
-    time.sleep(3)
-    if row is not None:
-        cell = row[0]['Company (Ticker)']
-        ticker = cell[cell.find("(") + 1:cell.find(")")]
-        dg = calculate_dividend_summary.get_dividend_summary(ticker=ticker, time_delta=time_delta_dividends)
+def display_dividend_summary(data):
+    if data is not None:
+        dg = calculate_dividend_summary.get_dividend_summary(data=data, time_delta=time_delta_dividends)
         columns = [{"name": i, "id": i, } for i in dg.columns]
         dg_data = dg.to_dict('records')
         return dash_table.DataTable(data=dg_data, columns=columns, fill_width=False, style_table={'overflowX': 'auto'},
@@ -135,52 +178,27 @@ def display_dividend_summary(row):
 
 
 @callback(
-    Output("dividends_full", "children"),
+    Output("title-dividend_Payout", "children"),
     Input("dividends_general_grid", "selectedRows")
 )
-def display_dividend_table(row):
+def display_dividend_payout_title(row):
     if row is not None:
-        time.sleep(3)
         cell = row[0]['Company (Ticker)']
         ticker = cell[cell.find("(") + 1:cell.find(")")]
-        dg = get_dividends_historical_by_ticker.get_historical_dividends(ticker=ticker, time_delta=time_delta_dividends)
-        dg["date"] = pd.to_datetime(dg["date"])
-        dg["YEAR"] = dg["date"].dt.year
-        dg["date"] = dg["date"].dt.date
-        dg.sort_values(by='date', ascending=False, inplace=True)
-        columns = [{"name": i, "id": i, } for i in dg[['YEAR', 'dividend', 'date']]]
-        dg['YEAR'] = dg['YEAR'].where(dg['YEAR'] != dg['YEAR'].shift(), '')
-        return dash_table.DataTable(data=dg.to_dict('records'), columns=columns, fill_width=False,
-                                    style_header=style_header,
-                                    style_cell=style_cell,
-                                    style_data_conditional=style_data_conditional,
-                                    style_table=style_table,
-                                    )
+        return html.H2(f"Dividend Payout History for [{ticker}]")
 
 
 @callback(
-    Output("dividends", "children"),
-    Input("dividends_general_grid", "selectedRows")
-)
-def display_cell_clicked_on(row):
-    if row is None:
-        return "Click on a row for dividends details..."
-    return f"{row[0]['Company (Ticker)']}"
-
-
-@callback(
-    Output("stocks", "figure"),
+    Output("stocks", "children"),
     Input("dividends_general_grid", "selectedRows")
 )
 def display_stocks_figure(row):
-    if row is None:
-        fig_historical_data = go.Figure([go.Scatter(x=[], y=[])])
-    else:
+    if row is not None:
         cell = row[0]['Company (Ticker)']
         ticker = cell[cell.find("(") + 1:cell.find(")")]
         df = get_historical_data_by_ticker.get_historical_data(ticker=ticker, start_date=START_DATE,
                                                                end_date=END_DATE, days_delta=time_delta_stocks)
-        fig_historical_data = go.Figure([go.Scatter(x=df[df.columns[0]], y=df['close'])])
+        fig_historical_data = px.line(df, x='date', y='close')
         fig_historical_data.update_layout(title=dict(
             text=f"<b>Stock Price (5 Years) for [{ticker}]</b>",
             font=dict(
@@ -192,39 +210,11 @@ def display_stocks_figure(row):
             x=0.5,
             xanchor='center',
             yanchor='top'),
-            yaxis_title='<b>Stock Price US$</b>'
+            yaxis_title='<b>Stock Price US$</b>',
+            xaxis_title=""
         )
-    return fig_historical_data
+        return dcc.Graph(figure=fig_historical_data)
 
 
-@callback(
-    Output("dividends_hist", "figure"),
-    Input("dividends_general_grid", "selectedRows")
-)
-def display_historical_dividends_figure(row):
-    if row is None:
-        fig_historical_dividends = go.Figure([go.Scatter(x=[], y=[])])
-    else:
-        cell = row[0]['Company (Ticker)']
-        ticker = cell[cell.find("(") + 1:cell.find(")")]
-        df = get_dividends_historical_by_ticker.get_historical_dividends(ticker=ticker, time_delta=time_delta_dividends)
-        fig_historical_dividends = go.Figure([go.Scatter(x=df['date'], y=df['dividend'])])
-        fig_historical_dividends.update_layout(title=dict(
-            text=f"<b>Historical Dividends Information for [{ticker}]</b>",
-            font=dict(
-                family=font_figure,
-                size=font_size,
-                color=dark_gray
-            ),
-            y=0.9,
-            x=0.5,
-            xanchor='center',
-            yanchor='top'),
-            yaxis_title='<b>Dividends US$</b>'
-        )
-    return fig_historical_dividends
-
-
-# Run the app
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run_server(debug=True)

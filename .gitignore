@@ -1,4 +1,7 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
 /.idea/
 .gitignore
 /csv_files/*
-__pycache__/

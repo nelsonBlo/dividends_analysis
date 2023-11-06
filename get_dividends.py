@@ -8,7 +8,6 @@ import configparser
 config = configparser.ConfigParser()
 config.read('./conf/general.conf')
 INITIAL_PART_DIVIDENDS_BY_DATE = config.get('FILE_NAMES', 'INITIAL_PART_DIVIDENDS_BY_DATE')
-# INITIAL_PART_DIVIDENDS_BY_DATE = 'dividends_by_date_'
 
 
 def get_dividends_next_week(country=5, filter_time='nextWeek'):

@@ -8,7 +8,6 @@ import configparser
 config = configparser.ConfigParser()
 config.read('./conf/general.conf')
 INITIAL_PART_HISTORICAL_DIVIDENDS_TICKER = config.get('FILE_NAMES', 'INITIAL_PART_HISTORICAL_DIVIDENDS_TICKER')
-# INITIAL_PART_HISTORICAL_DIVIDENDS_TICKER = 'historical_dividends_'
 
 
 def get_historical_dividends(ticker='KO', time_delta=60):

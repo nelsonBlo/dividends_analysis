@@ -15,8 +15,7 @@ def get_dividends_next_week(country=5, filter_time='nextWeek'):
     latest_file = get_latest_file(file_name)
     if latest_file:
         try:
-            with open(latest_file) as f:
-                return pd.read_csv(latest_file)
+            return pd.read_csv(latest_file)
         except:
             raise SystemExit(
                 f"\033[91m Can not open file {latest_file} or does not have proper format. \033[0m")

@@ -10,9 +10,9 @@ config.read('./conf/general.conf')
 INITIAL_PART_DIVIDENDS_BY_DATE = config.get('FILE_NAMES', 'INITIAL_PART_DIVIDENDS_BY_DATE')
 
 
-def get_dividends_next_week(country=5, filter_time='nextWeek'):
+def get_dividends_next_week(country=5, filter_time='nextWeek', days_delta=120):
     file_name = f'{INITIAL_PART_DIVIDENDS_BY_DATE}{country}'
-    latest_file = get_latest_file(file_name)
+    latest_file = get_latest_file(file_name, days_delta=days_delta)
     if latest_file:
         try:
             return pd.read_csv(latest_file)

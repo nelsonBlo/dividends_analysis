@@ -42,13 +42,15 @@ def tune_investing_response_and_save(response, filename):
 
     list_as_df = pd.DataFrame(np.reshape(np.array(clearl_list), (int(len(clearl_list) / 6), 6)),
                               columns=headers)
+    list_as_df["Dividend"] = pd.to_numeric(list_as_df["Dividend"], errors='coerce')
+    # list_as_df["Dividend"]= list_as_df["Dividend"].round(6)
     save_response_to_csv(list_as_df, filename)
     return list_as_df
 
 
 def save_response_to_csv(list_as_df, filename, index=False):
     try:
-        list_as_df.to_csv(f'./csv_files/{filename}', index = index)
+        list_as_df.to_csv(f'./csv_files/{filename}', index = index, float_format='%.6f')
     except:
         raise SystemExit(
             f"\033[91m Can not save file {filename} on local system. \033[0m")

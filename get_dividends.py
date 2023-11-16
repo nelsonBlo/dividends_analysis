@@ -11,7 +11,7 @@ INITIAL_PART_DIVIDENDS_BY_DATE = config.get('FILE_NAMES', 'INITIAL_PART_DIVIDEND
 
 
 def get_dividends_next_week(country=5, filter_time='nextWeek', days_delta=120):
-    file_name = f'{INITIAL_PART_DIVIDENDS_BY_DATE}{country}'
+    file_name = f'{INITIAL_PART_DIVIDENDS_BY_DATE}{country}_{filter_time}'
     latest_file = get_latest_file(file_name, days_delta=days_delta)
     if latest_file:
         try:
@@ -21,6 +21,6 @@ def get_dividends_next_week(country=5, filter_time='nextWeek', days_delta=120):
                 f"\033[91m Can not open file {latest_file} or does not have proper format. \033[0m")
     else:
         final_part = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-        file_name = f'{INITIAL_PART_DIVIDENDS_BY_DATE}{country}_{final_part}.csv'
+        file_name = f'{INITIAL_PART_DIVIDENDS_BY_DATE}{country}_{filter_time}_{final_part}.csv'
         response_json = get_dividends_next_week_post(country=country, filter_time=filter_time)
         return tune_investing_response_and_save(response_json, file_name)

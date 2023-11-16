@@ -26,7 +26,6 @@ START_DATE = END_DATE - timedelta(days=1825)
 START_DATE = START_DATE.strftime('%m/%d/%Y')
 END_DATE = END_DATE.strftime('%m/%d/%Y')
 
-df = get_dividends.get_dividends_next_week(country=country, filter_time=filter_time)
 
 app = Dash(__name__)
 style_header = {
@@ -63,11 +62,54 @@ columnDefs = [
     {"field": "Yield"}
 ]
 
+
 app.layout = html.Div(
     [
-        html.Div([html.H2(f"Dividends Information for {filter_time}:")],
-                 style={'font-family': font_figure, "color": main_color}),
-        html.Div([dag.AgGrid(
+        html.Div([
+            html.Div([
+                html.H2("Dividends Calendar for ", style={'margin': '0', 'marginRight': '5px', 'padding': '10px',
+                                                          'font-family': font_figure, "color": main_color}),
+                dcc.Dropdown(
+                    id='dropdown_range',
+                    options=[
+                        {'label': 'Next Week', 'value': 'nextWeek'},
+                        {'label': 'This Week', 'value': 'thisWeek'},
+                        {'label': 'Tomorrow', 'value': 'tomorrow'}
+                    ],
+                    # value='nextWeek',
+                    placeholder="Select an option",
+                    style={'width': '200px', 'font-family': font_figure, "color": dark_gray},
+                    className='my-dropdown',
+                    persistence=True
+                )
+            ], style={'display': 'flex', 'align-items': 'center'})
+        ]),
+        html.Div([html.Div(id='dividends_grid', children=[]), ]),
+        html.Div([dag.AgGrid(id="dividends_general_grid")], style={'display': 'none'}),
+        html.Div("For reference purposes only - Developed by Nelson Bocanegra L.",
+                 style={'font-family': font_figure, 'fontSize': 8, 'color': dark_gray}),
+        html.Div([html.Div(id='stocks', children=[]), ]),
+        html.Div([html.Div(id='dividends_hist', children=[]), ]),
+        html.Div(id="title-dividend_Payout",
+                 style={'textAlign': 'center', 'font-family': font_figure, 'color': dark_gray}, ),
+        html.Div(style={'color': 'black', "display": "flex", "justify-content": "center", "align-items": "center",
+                        'padding': '15px', "height": "8vh", 'font': font_figure}, id='dividends_summary', children=[]),
+        html.Div(style={"width": "15%", "textAlign": "center", 'marginLeft': 'auto', 'marginRight': 'auto',
+                        'font': font_figure}, id="dividends_full"),
+
+        dcc.Store(id='store-data', data=[], storage_type='memory')
+    ]
+)
+
+
+@callback(
+    Output('dividends_grid', 'children'),
+    Input('dropdown_range', 'value')
+)
+def update_output(value):
+    if value is not None:
+        df = get_dividends.get_dividends_next_week(country=country, filter_time=value)
+        return dag.AgGrid(
             id="dividends_general_grid",
             rowData=df.to_dict("records"),
             className="ag-theme-alpine",
@@ -78,23 +120,7 @@ app.layout = html.Div(
             columnSizeOptions={
                 'defaultMinWidth': 90,
                 'columnLimits': [{'key': 'Date', 'minWidth': 250},
-                                 {'key': 'Company (Ticker)', 'minWidth': 500}],
-            },
-        )]),
-        html.Div([html.Div(id='stocks', children=[]), ]),
-        html.Div([html.Div(id='dividends_hist', children=[]), ]),
-        html.Div(id="title-dividend_Payout",
-                 style={'textAlign': 'center', 'font-family': font_figure, 'color': dark_gray},
-                 ),
-        html.Div(
-            style={'color': 'black', "display": "flex", "justify-content": "center", "align-items": "center",
-                   "height": "8vh",'font': font_figure}, id='dividends_summary', children=[]),
-        html.Div(style={"width": "15%", "textAlign": "center", 'marginLeft': 'auto', 'marginRight': 'auto',
-                        'font': font_figure}, id="dividends_full"),
-
-        dcc.Store(id='store-data', data=[], storage_type='memory')
-    ]
-)
+                                 {'key': 'Company (Ticker)', 'minWidth': 500}]})
 
 
 @callback(
@@ -151,6 +177,7 @@ def display_dividend_table(data):
                                     style_header=style_header,
                                     style_cell=style_cell,
                                     style_data_conditional=style_data_conditional,
+                                    style_data={'color': dark_gray},
                                     style_table=style_table,
                                     )
 

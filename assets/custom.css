@@ -1,3 +1,16 @@
 .dash-table-container .dash-spreadsheet-container {
     display: table-cell!important;
 }
+
+# CSS styles to modify dropdown options and selected text color
+.my-dropdown .VirtualizedSelectOption {
+    color: #636EFA !important;  /* Change options text color */
+}
+.my-dropdown .VirtualizedSelectFocusedOption {
+    color: white !important; /* Change focused option background */
+    background-color: #636EFA !important; /* Change focused option text color */
+}
+.my-dropdown .Select-value-label {
+    color: #636EFA !important; /* Change selected option text color */
+    font-weight: bold !important; /* Make selected option bold */
+}

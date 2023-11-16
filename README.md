@@ -7,10 +7,11 @@ position and historical behavior in the stock market. And it is also necessary t
 payments: since when have they been paid? is the percentage increasing or decreasing?, perhaps is it constant?, 
 what is the frequency?
 
-This app helps answer these questions quickly. It shows the list of companies that will pay dividends `next week` and 
-displays this list in a grid. Information that will be seen here: Company Name, Dividend, Payment Date, etc.
+This app helps answer these questions quickly. It shows the list of companies that will pay dividends in a certain 
+period of your choice. You can choose between `next week`, `this week` or `tomorrow`.  Information that will be seen 
+here: Company Name, Dividend, Payment Date, etc.
 
-![img_3.png](img_3.png)
+![img_6.png](img_6.png)
 
 By selecting a company, related information will be displayed in the graphs and tables located below.
 - Stock Price for the last 5 years:

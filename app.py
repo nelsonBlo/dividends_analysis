@@ -20,12 +20,11 @@ time_delta_stocks = config.getfloat('TIME_DELTA_DAYS', 'HISTORICAL_DATA')
 time_delta_dividends = config.getint('TIME_DELTA_DAYS', 'DIVIDENDS')
 main_color = config.get('COLOR', 'MAIN_COLOR')
 dark_gray = config.get('COLOR', 'DARK_GRAY')
-
+light_gray = config.get('COLOR', 'LIGHT_GRAY')
 END_DATE = date.today()
 START_DATE = END_DATE - timedelta(days=1825)
 START_DATE = START_DATE.strftime('%m/%d/%Y')
 END_DATE = END_DATE.strftime('%m/%d/%Y')
-
 
 app = Dash(__name__)
 style_header = {
@@ -62,32 +61,35 @@ columnDefs = [
     {"field": "Yield"}
 ]
 
-
 app.layout = html.Div(
     [
+        html.Div([html.H2("Dividends Calendar for ",
+                          style={'margin': '0', 'marginRight': '5px', 'margin-top': '10px', 'padding': '10px',
+                                 'font-family': font_figure, "color": main_color}),
+                  dcc.Dropdown(
+                      id='dropdown_range',
+                      options=[
+                          {'label': 'Next Week', 'value': 'nextWeek'},
+                          {'label': 'This Week', 'value': 'thisWeek'},
+                          {'label': 'Tomorrow', 'value': 'tomorrow'}
+                      ],
+                      placeholder="Select an option",
+                      style={'width': '200px', 'font-family': font_figure, "color": dark_gray, 'margin-top': '5px'},
+                      className='my-dropdown',
+                      persistence=True
+                  )
+                  ], style={'display': 'flex', 'align-items': 'center'}),
         html.Div([
-            html.Div([
-                html.H2("Dividends Calendar for ", style={'margin': '0', 'marginRight': '5px', 'padding': '10px',
-                                                          'font-family': font_figure, "color": main_color}),
-                dcc.Dropdown(
-                    id='dropdown_range',
-                    options=[
-                        {'label': 'Next Week', 'value': 'nextWeek'},
-                        {'label': 'This Week', 'value': 'thisWeek'},
-                        {'label': 'Tomorrow', 'value': 'tomorrow'}
-                    ],
-                    # value='nextWeek',
-                    placeholder="Select an option",
-                    style={'width': '200px', 'font-family': font_figure, "color": dark_gray},
-                    className='my-dropdown',
-                    persistence=True
-                )
-            ], style={'display': 'flex', 'align-items': 'center'})
-        ]),
+            html.Footer("For reference purposes only - Developed by Nelson Bocanegra L.",
+                        style={'font-family': font_figure, 'fontSize': 8, 'text-align': 'right', 'margin-top': '0px',
+                               'margin-right': '0px', 'padding': 2}),
+            html.Div(style={'clear': 'both'})]),
         html.Div([html.Div(id='dividends_grid', children=[]), ]),
         html.Div([dag.AgGrid(id="dividends_general_grid")], style={'display': 'none'}),
-        html.Div("For reference purposes only - Developed by Nelson Bocanegra L.",
-                 style={'font-family': font_figure, 'fontSize': 8, 'color': dark_gray}),
+        html.Div([
+            html.Footer("Info taken from investing.com", style={'text-align': 'left', 'font-family': font_figure,
+                                                                'margin-top': '5px', 'fontSize': 8, 'color': light_gray,
+                                                                'margin-right': '10px'})]),
         html.Div([html.Div(id='stocks', children=[]), ]),
         html.Div([html.Div(id='dividends_hist', children=[]), ]),
         html.Div(id="title-dividend_Payout",
@@ -150,11 +152,7 @@ def display_historical_dividends_figure(data):
         fig_historical_dividends = px.line(dff, x='date', y='dividend', markers=True)
         fig_historical_dividends.update_layout(title=dict(
             text=f"<b>Historical Dividends Information for [{dff['ticker'][0]}]</b>",
-            font=dict(
-                family=font_figure,
-                size=font_size,
-                color=dark_gray
-            ),
+            font=dict(family=font_figure, size=font_size, color=dark_gray),
             y=0.9,
             x=0.5,
             xanchor='center',
@@ -162,6 +160,10 @@ def display_historical_dividends_figure(data):
             yaxis_title='<b>Dividends US$</b>',
             xaxis_title=""
         )
+        fig_historical_dividends.add_annotation(text='Info taken from yahoo_fin', xref='x domain',
+                                                showarrow=False,
+                                                font=dict(family=font_figure, size=8, color=light_gray),
+                                                yref='y domain', y=-0.12)
         return dcc.Graph(figure=fig_historical_dividends)
 
 
@@ -178,8 +180,7 @@ def display_dividend_table(data):
                                     style_cell=style_cell,
                                     style_data_conditional=style_data_conditional,
                                     style_data={'color': dark_gray},
-                                    style_table=style_table,
-                                    )
+                                    style_table=style_table)
 
 
 @callback(
@@ -195,12 +196,8 @@ def display_dividend_summary(data):
                                     style_cell={'text-align': 'center', "font-family": font_figure,
                                                 'backgroundColor': '#ccccc'},
                                     style_data={'backgroundColor': '#E8E8E8', 'color': dark_gray},
-                                    style_header={
-                                        "backgroundColor": main_color,
-                                        "color": "#FFFFFF",
-                                        "padding": "10px",
-                                        "border": "0",
-                                    }
+                                    style_header={"backgroundColor": main_color, "color": "#FFFFFF", "padding": "10px",
+                                                  "border": "0"}
                                     )
 
 
@@ -212,7 +209,11 @@ def display_dividend_payout_title(row):
     if row is not None:
         cell = row[0]['Company (Ticker)']
         ticker = cell[cell.find("(") + 1:cell.find(")")]
-        return html.H2(f"Dividend Payout History for [{ticker}]")
+        return html.Div([
+            html.H2(f"Dividend Payout History for [{ticker}]"),
+            html.P('Info taken from yahoo_fin', style={'font-family': font_figure, 'padding': '0px',
+                                                       'margin-top': '0px', 'fontSize': 8, 'color': light_gray})
+        ])
 
 
 @callback(
@@ -228,11 +229,7 @@ def display_stocks_figure(row):
         fig_historical_data = px.line(df, x='date', y='close')
         fig_historical_data.update_layout(title=dict(
             text=f"<b>Stock Price (5 Years) for [{ticker}]</b>",
-            font=dict(
-                family=font_figure,
-                size=font_size,
-                color=dark_gray
-            ),
+            font=dict(family=font_figure, size=font_size, color=dark_gray),
             y=0.9,
             x=0.5,
             xanchor='center',
@@ -240,6 +237,9 @@ def display_stocks_figure(row):
             yaxis_title='<b>Stock Price US$</b>',
             xaxis_title=""
         )
+        fig_historical_data.add_annotation(
+            text='Info taken from yahoo_fin', xref='x domain', showarrow=False,
+            font=dict(family=font_figure, size=8, color=light_gray), yref='y domain', y=-0.12)
         return dcc.Graph(figure=fig_historical_data)
 
 

@@ -14,3 +14,33 @@
     color: #636EFA !important; /* Change selected option text color */
     font-weight: bold !important; /* Make selected option bold */
 }
+
+/* Configuration for Titles */
+@media screen and (max-width: 600px) {
+  /* Adjust title font size for smaller screens */
+  .plotly-title {
+    font-size: 18px;
+  }
+}
+
+@media screen and (min-width: 601px) {
+  /* Default title font size for larger screens */
+  .plotly-title {
+    font-size: 24px;
+  }
+}
+
+/* Configuration for Footnotes */
+@media screen and (max-width: 600px) {
+  /* Adjust footnote font size for smaller screens */
+  .plotly-footnote {
+    font-size: 11px;
+  }
+}
+
+@media screen and (min-width: 601px) {
+  /* Default footnote font size for larger screens */
+  .plotly-footnote {
+    font-size: 8px;
+  }
+}

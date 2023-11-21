@@ -63,7 +63,7 @@ columnDefs = [
 
 app.layout = html.Div(
     [
-        html.Div([html.H2("Dividends Calendar for ",
+        html.Div([html.H2("Dividends Calendar for ", className="plotly-title",
                           style={'margin': '0', 'marginRight': '5px', 'margin-top': '10px', 'padding': '10px',
                                  'font-family': font_figure, "color": main_color}),
                   dcc.Dropdown(
@@ -80,24 +80,25 @@ app.layout = html.Div(
                   )
                   ], style={'display': 'flex', 'align-items': 'center'}),
         html.Div([
-            html.Footer("For reference purposes only - Developed by Nelson Bocanegra L.",
+            html.Footer("For reference purposes only - Developed by Nelson Bocanegra L.", className="plotly-footnote",
                         style={'font-family': font_figure, 'fontSize': 8, 'text-align': 'right', 'margin-top': '0px',
                                'margin-right': '0px', 'padding': 2}),
             html.Div(style={'clear': 'both'})]),
         html.Div([html.Div(id='dividends_grid', children=[]), ]),
         html.Div([dag.AgGrid(id="dividends_general_grid")], style={'display': 'none'}),
         html.Div([
-            html.Footer("Info taken from investing.com", style={'text-align': 'left', 'font-family': font_figure,
-                                                                'margin-top': '5px', 'fontSize': 8, 'color': light_gray,
-                                                                'margin-right': '10px'})]),
+            html.Footer("Info taken from investing.com", className="plotly-footnote",
+                        style={'text-align': 'left', 'font-family': font_figure,
+                               'margin-top': '5px', 'color': light_gray,
+                               'margin-right': '10px'})]),
         html.Div([html.Div(id='stocks', children=[]), ]),
         html.Div([html.Div(id='dividends_hist', children=[]), ]),
         html.Div(id="title-dividend_Payout",
                  style={'textAlign': 'center', 'font-family': font_figure, 'color': dark_gray}, ),
         html.Div(style={'color': 'black', "display": "flex", "justify-content": "center", "align-items": "center",
                         'padding': '15px', "height": "8vh", 'font': font_figure}, id='dividends_summary', children=[]),
-        html.Div(style={"width": "15%", "textAlign": "center", 'marginLeft': 'auto', 'marginRight': 'auto',
-                        'font': font_figure}, id="dividends_full"),
+        html.Div(style={'display': 'flex', "textAlign": "center", 'marginLeft': 'auto', 'marginRight': 'auto',
+                        'justifyContent': 'center', 'alignItems': 'center', 'font': font_figure}, id="dividends_full"),
 
         dcc.Store(id='store-data', data=[], storage_type='memory')
     ]
@@ -196,7 +197,7 @@ def display_dividend_summary(data):
                                     style_cell={'text-align': 'center', "font-family": font_figure,
                                                 'backgroundColor': '#ccccc'},
                                     style_data={'backgroundColor': '#E8E8E8', 'color': dark_gray},
-                                    style_header={"backgroundColor": main_color, "color": "#FFFFFF", "padding": "10px",
+                                    style_header={"backgroundColor": main_color, "color": "#FFFFFF", "padding": "0px",
                                                   "border": "0"}
                                     )
 
@@ -210,9 +211,10 @@ def display_dividend_payout_title(row):
         cell = row[0]['Company (Ticker)']
         ticker = cell[cell.find("(") + 1:cell.find(")")]
         return html.Div([
-            html.H2(f"Dividend Payout History for [{ticker}]"),
-            html.P('Info taken from yahoo_fin', style={'font-family': font_figure, 'padding': '0px',
-                                                       'margin-top': '0px', 'fontSize': 8, 'color': light_gray})
+            html.H2(f"Dividend Payout History for [{ticker}]", className="plotly-title", style={'padding': '0px'}),
+            html.P('Info taken from yahoo_fin', className="plotly-footnote",
+                   style={'font-family': font_figure, 'padding': '0px',
+                          'margin-top': '0px', 'color': light_gray})
         ])
 
 

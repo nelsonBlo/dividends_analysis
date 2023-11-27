@@ -21,6 +21,7 @@ time_delta_dividends = config.getint('TIME_DELTA_DAYS', 'DIVIDENDS')
 main_color = config.get('COLOR', 'MAIN_COLOR')
 dark_gray = config.get('COLOR', 'DARK_GRAY')
 light_gray = config.get('COLOR', 'LIGHT_GRAY')
+footer_font_size=config.getint('FONT_SIZE', 'FOOTER_SIZE')
 END_DATE = date.today()
 START_DATE = END_DATE - timedelta(days=1825)
 START_DATE = START_DATE.strftime('%m/%d/%Y')
@@ -80,17 +81,16 @@ app.layout = html.Div(
                   )
                   ], style={'display': 'flex', 'align-items': 'center'}),
         html.Div([
-            html.Footer("For reference purposes only - Developed by Nelson Bocanegra L.", className="plotly-footnote",
-                        style={'font-family': font_figure, 'fontSize': 8, 'text-align': 'right', 'margin-top': '0px',
+            html.Footer("For reference purposes only - Developed by Nelson Bocanegra L.",className="plotly-footnote",
+                        style={'font-family': font_figure, 'fontSize': footer_font_size, 'text-align': 'right', 'margin-top': '0px',
                                'margin-right': '0px', 'padding': 2}),
             html.Div(style={'clear': 'both'})]),
         html.Div([html.Div(id='dividends_grid', children=[]), ]),
         html.Div([dag.AgGrid(id="dividends_general_grid")], style={'display': 'none'}),
         html.Div([
-            html.Footer("Info taken from investing.com", className="plotly-footnote",
-                        style={'text-align': 'left', 'font-family': font_figure,
-                               'margin-top': '5px', 'color': light_gray,
-                               'margin-right': '10px'})]),
+            html.Footer("Info taken from investing.com", className="plotly-footnote",style={'text-align': 'left', 'font-family': font_figure,
+                                                                'margin-top': '5px', 'fontSize': footer_font_size, 'color': light_gray,
+                                                                'margin-right': '10px'})]),
         html.Div([html.Div(id='stocks', children=[]), ]),
         html.Div([html.Div(id='dividends_hist', children=[]), ]),
         html.Div(id="title-dividend_Payout",
@@ -163,7 +163,7 @@ def display_historical_dividends_figure(data):
         )
         fig_historical_dividends.add_annotation(text='Info taken from yahoo_fin', xref='x domain',
                                                 showarrow=False,
-                                                font=dict(family=font_figure, size=8, color=light_gray),
+                                                font=dict(family=font_figure, size=footer_font_size, color=light_gray),
                                                 yref='y domain', y=-0.12)
         return dcc.Graph(figure=fig_historical_dividends)
 
@@ -212,9 +212,8 @@ def display_dividend_payout_title(row):
         ticker = cell[cell.find("(") + 1:cell.find(")")]
         return html.Div([
             html.H2(f"Dividend Payout History for [{ticker}]", className="plotly-title", style={'padding': '0px'}),
-            html.P('Info taken from yahoo_fin', className="plotly-footnote",
-                   style={'font-family': font_figure, 'padding': '0px',
-                          'margin-top': '0px', 'color': light_gray})
+            html.P('Info taken from yahoo_fin', className="plotly-footnote",style={'font-family': font_figure, 'padding': '0px',
+                                                       'margin-top': '0px', 'fontSize': footer_font_size, 'color': light_gray})
         ])
 
 
@@ -241,7 +240,7 @@ def display_stocks_figure(row):
         )
         fig_historical_data.add_annotation(
             text='Info taken from yahoo_fin', xref='x domain', showarrow=False,
-            font=dict(family=font_figure, size=8, color=light_gray), yref='y domain', y=-0.12)
+            font=dict(family=font_figure, size=footer_font_size, color=light_gray), yref='y domain', y=-0.12)
         return dcc.Graph(figure=fig_historical_data)
 
 

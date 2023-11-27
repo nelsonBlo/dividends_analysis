@@ -1,9 +1,9 @@
 Dividends Information & Analysis for a given Period
 ===
 
-What companies are about to pay dividends? 
-Sometimes we need to clear up this doubt. But in addition, we need to get vital information about the company: its current 
-position and historical behavior in the stock market. And it is also necessary to know their history of dividend 
+What companies are about to pay dividends?
+You can clear this doubt up with this app. And, in addition, you can get also vital information about the company: its current 
+position and historical behavior in the stock market. And also collect their history of dividend 
 payments: since when have they been paid? is the percentage increasing or decreasing?, perhaps is it constant?, 
 what is the frequency?
 

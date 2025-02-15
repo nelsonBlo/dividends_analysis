@@ -1,6 +1,6 @@
 beautifulsoup4==4.10.0
-curl_cffi==0.5.9
-dash==2.14.0
+curl_cffi==0.7.4
+dash==2.15.0
 dash_ag_grid==2.4.0
 numpy==1.26.2
 pandas==2.1.3

@@ -4,7 +4,7 @@ import pandas as pd
 from datetime import datetime, timedelta
 from bs4 import BeautifulSoup
 
-days_list = ['Monday,', 'Tuesday,', 'Wednesday,', 'Thursday,', 'Friday,']
+days_list = ['Monday,', 'Tuesday,', 'Wednesday,', 'Thursday,', 'Friday,', 'Saturday,', 'Sunday,']
 headers = ["Date", "Company (Ticker)", "Ex-Dividend Date", "Dividend", "Payment Date", "Yield"]
 
 

@@ -23,6 +23,6 @@ def get_historical_dividends(ticker='KO', time_delta=60):
     else:
         final_part = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
         file_name = f'{INITIAL_PART_HISTORICAL_DIVIDENDS_TICKER}{ticker}_{final_part}.csv'
-        response_json = get_historical_dividends_get(ticker)
-        save_response_to_csv(response_json, file_name)
-    return response_json
+        response_df = get_historical_dividends_get(ticker)
+        save_response_to_csv(response_df, file_name)
+        return response_df

@@ -10,6 +10,18 @@ INITIAL_PART_DIVIDENDS_SUMMARY = config.get('FILE_NAMES', 'INITIAL_PART_DIVIDEND
 
 
 def get_dividend_summary(data=None, time_delta=60):
+    # Validate input data
+    if data is None or len(data) == 0:
+        return None
+    
+    # Check if data has required structure
+    if not isinstance(data, list) or len(data) == 0:
+        return None
+    
+    # Check if first item has required keys
+    if not isinstance(data[0], dict) or 'ticker' not in data[0]:
+        return None
+    
     ticker = data[0]['ticker']
     file_name = f'{INITIAL_PART_DIVIDENDS_SUMMARY}{ticker}'
     latest_file = get_latest_file(file_name=file_name, days_delta=time_delta)
